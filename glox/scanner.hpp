@@ -21,10 +21,18 @@ private:
 
     void scan_token();
     bool check_single_tokens(char c);
+    bool check_double_tokens(char c);
+    bool check_more_tokens(char c);
+    bool check_whitespace_tokens(char c);
+    bool check_longer_tokens(char c);
+
+    void parse_string();
 
     void add_token(scanner::token_type type);
     void add_token(const scanner::token& token);
 
+    bool match(char c);
+    char peek();
     char advance();
     bool finished();
 
