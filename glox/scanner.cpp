@@ -114,7 +114,7 @@ bool lexer::check_longer_tokens(char c)
     return true;
 }
 
-bool lexer::check_digit_token(char c)
+bool lexer::check_digit_tokens(char c)
 {
     if (isdigit(c))
     {
@@ -122,6 +122,16 @@ bool lexer::check_digit_token(char c)
         return true;
     }
 
+    return false;
+}
+
+bool lexer::check_identifier_tokens(char c)
+{
+    if (isalpha(c) || c == '_')
+    {
+        parse_identifier();
+        return true;
+    }
     return false;
 }
 
@@ -163,8 +173,21 @@ void lexer::scan_token()
         return;
     }
 
-    res = check_digit_token(c);
-    if (!res)
+    res = check_digit_tokens(c);
+    if (res)
+    {
+//        std::cout << "Found digit token!\n";
+        return;
+    }
+
+    res = check_identifier_tokens(c);
+
+    if (res)
+    {
+//        std::cout << "Found digit token!\n";
+        return;
+    }
+    else
     {
         err(line, "An unexpected character was given!");
     }
@@ -240,6 +263,49 @@ void lexer::parse_digit()
     }
 
     add_token(scanner::token_type::NUMBER);
+}
+
+void lexer::parse_identifier()
+{
+    while(!finished() && (isalpha(peek()) || peek() == '_'))
+    {
+        advance();
+    }
+
+    auto get_identifier = [this](const std::string& name)
+    {
+        std::map<std::string, scanner::token_type> name_token_map =
+        {
+            {"and",    scanner::token_type::AND},
+            {"class",  scanner::token_type::CLASS},
+            {"else",   scanner::token_type::ELSE},
+            {"false",  scanner::token_type::FALSE},
+            {"fun",    scanner::token_type::FUN},
+            {"for",    scanner::token_type::FOR},
+            {"if",     scanner::token_type::IF},
+            {"nil",    scanner::token_type::NIL},
+            {"or",     scanner::token_type::OR},
+            {"print",  scanner::token_type::PRINT},
+            {"return", scanner::token_type::RETURN},
+            {"super",  scanner::token_type::SUPER},
+            {"this",   scanner::token_type::THIS},
+            {"true",   scanner::token_type::TRUE},
+            {"var",    scanner::token_type::VAR},
+            {"while",  scanner::token_type::WHILE},
+        };
+        auto token = name_token_map.find(name);
+        if (token == name_token_map.end())
+        {
+            return scanner::token_type::IDENTIFIER;
+        }
+
+        return token->second;
+    };
+
+    auto lexeme = buffer.substr(start, current - start);
+    auto identifier = get_identifier(lexeme);
+
+    add_token(identifier);
 }
 
 }
