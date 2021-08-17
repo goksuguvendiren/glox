@@ -108,9 +108,21 @@ bool lexer::check_longer_tokens(char c)
     switch (c)
     {
         case '"': parse_string(); break;
+        default: return false;
     }
 
     return true;
+}
+
+bool lexer::check_digit_token(char c)
+{
+    if (isdigit(c))
+    {
+        parse_digit();
+        return true;
+    }
+
+    return false;
 }
 
 void lexer::scan_token()
@@ -119,39 +131,39 @@ void lexer::scan_token()
     auto res = check_single_tokens(c);
     if (res)
     {
-        std::cout << "Found a single character token!\n";
+//        std::cout << "Found a single character token!\n";
         return;
     }
 
     res = check_double_tokens(c);
     if (res)
     {
-        std::cout << "Found a double character token!\n";
+//        std::cout << "Found a double character token!\n";
         return;
     }
 
     res = check_more_tokens(c);
     if (res)
     {
-        std::cout << "Found a one or more character token!\n";
+//        std::cout << "Found a one or more character token!\n";
         return;
     }
 
     res = check_whitespace_tokens(c);
     if (res)
     {
-        std::cout << "Found a whitespace!\n";
+//        std::cout << "Found a whitespace!\n";
         return;
     }
 
     res = check_longer_tokens(c);
     if (res)
     {
-        std::cout << "Found longer tokens!\n";
+//        std::cout << "Found longer tokens!\n";
         return;
     }
 
-
+    res = check_digit_token(c);
     if (!res)
     {
         err(line, "An unexpected character was given!");
@@ -163,9 +175,9 @@ char lexer::advance()
     return buffer[current++];
 }
 
-bool lexer::finished()
+bool lexer::finished(int offset)
 {
-    return current >= buffer.size();
+    return current + offset >= buffer.size();
 }
 
 void lexer::add_token(scanner::token_type type)
@@ -189,10 +201,10 @@ bool lexer::match(char c)
     return true;
 }
 
-char lexer::peek()
+char lexer::peek(int offset)
 {
-    if (finished()) return '\0';
-    return buffer[current];
+    if (finished(offset)) return '\0';
+    return buffer[current + offset];
 }
 
 void lexer::parse_string()
@@ -208,6 +220,26 @@ void lexer::parse_string()
     advance(); // get rid of the next "
 
     add_token(scanner::token_type::STRING);
+}
+
+void lexer::parse_digit()
+{
+    while(isdigit(peek()) && !finished()) advance();
+
+    if (peek() == '.') {
+        advance();
+
+        auto next = peek();
+        if (!isdigit(next))
+        {
+            err(line, "The floating point number should have a digit after the dot (.)");
+            return;
+        }
+
+        while(isdigit(peek())) advance();
+    }
+
+    add_token(scanner::token_type::NUMBER);
 }
 
 }

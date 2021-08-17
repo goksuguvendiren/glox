@@ -11,7 +11,7 @@ namespace glox::scanner
 {
 std::ostream &operator<<(std::ostream &os, const token &dt)
 {
-    os << dt.type;
+    os << dt.type << " (" << dt.lexeme << ")";
     return os;
 }
 
