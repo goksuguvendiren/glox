@@ -298,7 +298,7 @@ auto get_identifier(const std::string& name)
 
 bool can_be_identifier(char c)
 {
-    return (isalpha(c) || c == '_')
+    return (isalpha(c) || c == '_');
 }
 
 void lexer::parse_identifier()
