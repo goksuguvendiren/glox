@@ -265,42 +265,48 @@ void lexer::parse_digit()
     add_token(scanner::token_type::NUMBER);
 }
 
+auto get_identifier(const std::string& name)
+{
+    std::map<std::string, scanner::token_type> name_token_map =
+    {
+        {"and",    scanner::token_type::AND},
+        {"class",  scanner::token_type::CLASS},
+        {"else",   scanner::token_type::ELSE},
+        {"false",  scanner::token_type::FALSE},
+        {"fun",    scanner::token_type::FUN},
+        {"for",    scanner::token_type::FOR},
+        {"if",     scanner::token_type::IF},
+        {"nil",    scanner::token_type::NIL},
+        {"or",     scanner::token_type::OR},
+        {"print",  scanner::token_type::PRINT},
+        {"return", scanner::token_type::RETURN},
+        {"super",  scanner::token_type::SUPER},
+        {"this",   scanner::token_type::THIS},
+        {"true",   scanner::token_type::TRUE},
+        {"var",    scanner::token_type::VAR},
+        {"while",  scanner::token_type::WHILE},
+    };
+
+    auto token = name_token_map.find(name);
+    if (token == name_token_map.end())
+    {
+        return scanner::token_type::IDENTIFIER;
+    }
+
+    return token->second;
+}
+
+bool can_be_identifier(char c)
+{
+    return (isalpha(c) || c == '_')
+}
+
 void lexer::parse_identifier()
 {
-    while(!finished() && (isalpha(peek()) || peek() == '_'))
+    while(!finished() && can_be_identifier(peek()))
     {
         advance();
     }
-
-    auto get_identifier = [this](const std::string& name)
-    {
-        std::map<std::string, scanner::token_type> name_token_map =
-        {
-            {"and",    scanner::token_type::AND},
-            {"class",  scanner::token_type::CLASS},
-            {"else",   scanner::token_type::ELSE},
-            {"false",  scanner::token_type::FALSE},
-            {"fun",    scanner::token_type::FUN},
-            {"for",    scanner::token_type::FOR},
-            {"if",     scanner::token_type::IF},
-            {"nil",    scanner::token_type::NIL},
-            {"or",     scanner::token_type::OR},
-            {"print",  scanner::token_type::PRINT},
-            {"return", scanner::token_type::RETURN},
-            {"super",  scanner::token_type::SUPER},
-            {"this",   scanner::token_type::THIS},
-            {"true",   scanner::token_type::TRUE},
-            {"var",    scanner::token_type::VAR},
-            {"while",  scanner::token_type::WHILE},
-        };
-        auto token = name_token_map.find(name);
-        if (token == name_token_map.end())
-        {
-            return scanner::token_type::IDENTIFIER;
-        }
-
-        return token->second;
-    };
 
     auto lexeme = buffer.substr(start, current - start);
     auto identifier = get_identifier(lexeme);
