@@ -2,13 +2,27 @@
 // Created by Göksu Güvendiren on 8/17/21.
 //
 
-#ifndef GLOX_EXPRESSION_HPP
-#define GLOX_EXPRESSION_HPP
+#pragma once
 
+namespace glox::repr
+{
+class binary;
 
-class expression {
+template <class T>
+class opr;
 
+template <class T>
+class visitor
+{
+public:
+    T visit_binary_expr(const glox::repr::binary& binary);
+    T visit_operator_expr(const glox::repr::opr<T>& op);
 };
 
-
-#endif //GLOX_EXPRESSION_HPP
+template <class T>
+class expression
+{
+public:
+    virtual T accept(visitor<T> visitor) = 0;
+};
+}
