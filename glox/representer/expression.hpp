@@ -23,6 +23,6 @@ template <class T>
 class expression
 {
 public:
-    virtual T accept(visitor<T> visitor) = 0;
+    virtual T accept(const visitor<T>& visitor) = 0;
 };
 }

@@ -21,95 +21,98 @@ token::token(token_type type, std::string lexeme, int line) :
 
 std::ostream& operator<<(std::ostream &os, const token_type &token)
 {
-    std::string name;
+    os << to_string(token);
+    return os;
+}
+
+std::string to_string(const token_type &token)
+{
     switch (token) {
         case token_type::LEFT_PAREN:
-            name = "LEFT_PAREN"; break;
+            return "LEFT_PAREN";
         case token_type::RIGHT_PAREN:
-            name = "RIGHT_PAREN"; break;
+            return "RIGHT_PAREN";
         case token_type::LEFT_BRACE:
-            name = "LEFT_BRACE"; break;
+            return "LEFT_BRACE";
         case token_type::RIGHT_BRACE:
-            name = "RIGHT_BRACE"; break;
+            return "RIGHT_BRACE";
         case token_type::COMMA:
-            name = "COMMA"; break;
+            return "COMMA";
         case token_type::DOT:
-            name = "DOT"; break;
+            return "DOT";
         case token_type::MINUS:
-            name = "MINUS"; break;
+            return "MINUS";
         case token_type::PLUS:
-            name = "PLUS"; break;
+            return "PLUS";
         case token_type::SEMICOLON:
-            name = "SEMICOLON"; break;
+            return "SEMICOLON";
         case token_type::SLASH:
-            name = "SLASH"; break;
+            return "SLASH";
         case token_type::STAR:
-            name = "STAR"; break;
+            return "STAR";
 
         case token_type::BANG:
-            name = "BANG"; break;
+            return "BANG";
         case token_type::BANG_EQUAL:
-            name = "BANG_EQUAL"; break;
+            return "BANG_EQUAL";
         case token_type::EQUAL:
-            name = "EQUAL"; break;
+            return "EQUAL";
         case token_type::EQUAL_EQUAL:
-            name = "EQUAL_EQUAL"; break;
+            return "EQUAL_EQUAL";
         case token_type::GREATER:
-            name = "GREATER"; break;
+            return "GREATER";
         case token_type::GREATER_EQUAL:
-            name = "GREATER_EQUAL"; break;
+            return "GREATER_EQUAL";
         case token_type::LESS:
-            name = "LESS"; break;
+            return "LESS";
         case token_type::LESS_EQUAL:
-            name = "LESS_EQUAL"; break;
+            return "LESS_EQUAL";
 
         case token_type::IDENTIFIER:
-            name = "IDENTIFIER"; break;
+            return "IDENTIFIER";
         case token_type::STRING:
-            name = "STRING"; break;
+            return "STRING";
         case token_type::NUMBER:
-            name = "NUMBER"; break;
+            return "NUMBER";
 
         case token_type::AND:
-            name = "AND"; break;
+            return "AND";
         case token_type::CLASS:
-            name = "CLASS"; break;
+            return "CLASS";
         case token_type::ELSE:
-            name = "ELSE"; break;
+            return "ELSE";
         case token_type::FALSE:
-            name = "FALSE"; break;
+            return "FALSE";
         case token_type::FUN:
-            name = "FUN"; break;
+            return "FUN";
         case token_type::FOR:
-            name = "FOR"; break;
+            return "FOR";
         case token_type::IF:
-            name = "IF"; break;
+            return "IF";
         case token_type::NIL:
-            name = "NIL"; break;
+            return "NIL";
         case token_type::OR:
-            name = "OR"; break;
+            return "OR";
         case token_type::PRINT:
-            name = "PRINT"; break;
+            return "PRINT";
         case token_type::RETURN:
-            name = "RETURN"; break;
+            return "RETURN";
         case token_type::SUPER:
-            name = "SUPER"; break;
+            return "SUPER";
         case token_type::THIS:
-            name = "THIS"; break;
+            return "THIS";
         case token_type::TRUE:
-            name = "TRUE"; break;
+            return "TRUE";
         case token_type::VAR:
-            name = "VAR"; break;
+            return "VAR";
         case token_type::WHILE:
-            name = "WHILE"; break;
+            return "WHILE";
         case token_type::ENOF:
-            name = "ENOF"; break;
+            return "ENOF";
 
         default:
             std::cerr << "No such token_type exists!!!\n";
+            assert(false);
     }
-
-    os << name;
-    return os;
 }
 }

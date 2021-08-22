@@ -28,7 +28,7 @@ namespace glox::repr
         glox::repr::opr expr1;
         glox::repr::expression expr2;
 
-        T accept(visitor<T> visitor)
+        T accept(const visitor<T>& visitor)
         {
             return visitor.visit_binary_expr();
         }

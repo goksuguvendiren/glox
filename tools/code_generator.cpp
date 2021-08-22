@@ -8,6 +8,7 @@
 
 #include "code_generator.hpp"
 
+namespace {
 std::string generate_header()
 {
     std::stringstream stream;
@@ -97,12 +98,13 @@ std::string generate_visitor_function(const std::string& class_name)
 {
     std::stringstream stream;
 
-    stream << "\t\t\tT accept(visitor<T> visitor)\n";
+    stream << "\t\t\tT accept(const visitor<T>& visitor)\n";
     stream << "\t\t\t{\n";
     stream << "\t\t\t\treturn visitor.visit_" << class_name << "_expr();\n";
     stream << "\t\t\t}\n";
 
     return stream.str();
+}
 }
 
 void glox::code_generator::generate_ast(const std::string &output_folder, const std::string &filename,

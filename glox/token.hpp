@@ -24,9 +24,11 @@ enum class token_type
 
     // Keywords
     AND, CLASS, ELSE, FALSE, FUN, FOR, IF, NIL, OR,
-    PRINT, RETURN, SUPER, THIS, TRUE, VAR, WHILE, ENOF
+    PRINT, RETURN, SUPER, THIS, TRUE, VAR, WHILE, ENOF,
 };
 
+
+std::string to_string(const token_type& token);
 std::ostream& operator<<(std::ostream& os, const token_type& dt);
 
 class token
