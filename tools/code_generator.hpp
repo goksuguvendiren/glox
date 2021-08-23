@@ -18,7 +18,6 @@ public:
     };
 
     static void generate_ast(const std::string& output_folder,
-                             const std::string& filename,
                              std::vector<type_definition>& expressions);
 
 };

@@ -5,6 +5,7 @@
 #include <iostream>
 #include <sstream>
 #include <vector>
+#include <fstream>
 
 #include "code_generator.hpp"
 
@@ -33,7 +34,7 @@ std::string generate_class_definition(const std::string& class_name)
     stream << "namespace glox::repr\n";
     stream << "{\n";
     stream << "\ttemplate <class T>\n";
-    stream << "\tclass " + class_name + " : glox::repr::expression<T>\n";
+    stream << "\tclass " + class_name + " : public repr::expression<T>\n";
     stream << "\t{\n";
 
     return stream.str();
@@ -49,6 +50,21 @@ std::string generate_end_of_class()
     return stream.str();
 }
 
+bool gets_template(const std::string& param)
+{
+    if (param == "scanner::token") return false;
+    if (param == "double") return false;
+
+    return true;
+}
+
+bool trivially_copyable(const std::string& param)
+{
+    if (param == "double") return true;
+
+    return false;
+}
+
 std::string generate_public_functions(const glox::code_generator::type_definition& type)
 {
     std::stringstream stream;
@@ -59,8 +75,20 @@ std::string generate_public_functions(const glox::code_generator::type_definitio
     for (int i = 0; i < type.parameters.size(); ++i)
     {
         auto param = type.parameters[i];
-        stream << "\t\t\t" << param << " expr" << std::to_string(i) << "\n";
+        stream << "\t\t";
+        if (trivially_copyable(param)) stream << param;
+        else
+        {
+            stream << "std::unique_ptr<" << param;
+            if (gets_template(param)) stream << "<T>";
+            stream << ">";
+        }
+        stream << " expr" << std::to_string(i) << ",\n";
     }
+    // remove the last comma
+    stream.seekp(-2, std::ios_base::end);
+    stream << "\n";
+
 
     stream << "\t\t) : \n";
     for (int i = 0; i < type.parameters.size(); ++i)
@@ -75,6 +103,9 @@ std::string generate_public_functions(const glox::code_generator::type_definitio
 
     stream << "\t\t{}\n";
 
+    stream << "\n";
+    stream << "~" + type.type_name + "() = default;\n\n";
+
     return stream.str();
 }
 
@@ -88,7 +119,17 @@ std::string generate_private_members(const glox::code_generator::type_definition
     {
         auto param = type.parameters[i];
         auto varname = "expr" + std::to_string(i);
-        stream << "\t\t\t" << param << " " << varname << ";\n";
+        stream << "\t\t";
+
+        if (trivially_copyable(param)) stream << param;
+        else
+        {
+            stream << "std::unique_ptr<" << param;
+            if (gets_template(param)) stream << "<T>";
+            stream << ">";
+        }
+
+        stream << " " << varname << ";\n";
     }
 
     return stream.str();
@@ -98,21 +139,22 @@ std::string generate_visitor_function(const std::string& class_name)
 {
     std::stringstream stream;
 
-    stream << "\t\t\tT accept(const visitor<T>& visitor)\n";
-    stream << "\t\t\t{\n";
-    stream << "\t\t\t\treturn visitor.visit_" << class_name << "_expr();\n";
-    stream << "\t\t\t}\n";
+    stream << "\t\tT accept(const visitor<T>& visitor) const\n";
+    stream << "\t\t{\n";
+    stream << "\t\t\treturn visitor.visit_" << class_name << "_expr(*this);\n";
+    stream << "\t\t}\n";
 
     return stream.str();
 }
 }
 
-void glox::code_generator::generate_ast(const std::string &output_folder, const std::string &filename,
+void glox::code_generator::generate_ast(const std::string &output_folder,
                                         std::vector<glox::code_generator::type_definition> &expressions)
 {
     for (auto& expression : expressions)
     {
-        std::stringstream stream;
+//        std::stringstream stream;
+        std::ofstream stream(output_folder + "/" + expression.type_name + ".hpp");
 
         stream << generate_header();
         stream << "\n";
@@ -123,6 +165,8 @@ void glox::code_generator::generate_ast(const std::string &output_folder, const 
         stream << generate_visitor_function(expression.type_name);
         stream << generate_end_of_class();
 
-        std::cout << stream.str() << '\n';
+        if (!stream.is_open()) {
+            std::cout << "failed to open " << expression.type_name << '\n';
+        }
     }
 }

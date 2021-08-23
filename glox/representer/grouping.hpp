@@ -11,23 +11,23 @@
 namespace glox::repr
 {
 	template <class T>
-	class opr : public repr::expression<T>
+	class grouping : public repr::expression<T>
 	{
 	public:
-		opr(
-		std::unique_ptr<scanner::token> expr0
+		grouping(
+		std::unique_ptr<repr::expression<T>> expr0
 		) : 
 			expr0(std::move(expr0))
 		{}
 
-~opr() = default;
+~grouping() = default;
 
 	private:
-		std::unique_ptr<scanner::token> expr0;
+		std::unique_ptr<repr::expression<T>> expr0;
 
 		T accept(const visitor<T>& visitor) const
 		{
-			return visitor.visit_opr_expr(*this);
+			return visitor.visit_grouping_expr(*this);
 		}
 	};
 }
