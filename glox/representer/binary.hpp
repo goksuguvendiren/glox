@@ -23,7 +23,11 @@ namespace glox::repr
 			expr2(std::move(expr2))
 		{}
 
-~binary() = default;
+		~binary() = default;
+
+		const repr::expression& get_expr0() const { return *expr0; }
+		const repr::opr& get_expr1() const { return *expr1; }
+		const repr::expression& get_expr2() const { return *expr2; }
 
 	private:
 		std::unique_ptr<repr::expression> expr0;

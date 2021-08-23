@@ -19,7 +19,9 @@ namespace glox::repr
 			expr0(std::move(expr0))
 		{}
 
-~grouping() = default;
+		~grouping() = default;
+
+		const repr::expression& get_expr0() const { return *expr0; }
 
 	private:
 		std::unique_ptr<repr::expression> expr0;

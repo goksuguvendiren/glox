@@ -100,7 +100,19 @@ std::string generate_public_functions(const glox::code_generator::type_definitio
     stream << "\t\t{}\n";
 
     stream << "\n";
-    stream << "~" + type.type_name + "() = default;\n\n";
+    stream << "\t\t~" + type.type_name + "() = default;\n\n";
+
+    for (int i = 0; i < type.parameters.size(); ++i)
+    {
+        auto param = type.parameters[i];
+        auto varname = "expr" + std::to_string(i);
+        stream << "\t\t";
+        stream << "const " << param << "& get_" << varname << "() const { return ";
+        if (!trivially_copyable(param)) stream << "*";
+        stream << varname << "; }\n";
+    }
+
+    stream << "\n";
 
     return stream.str();
 }
@@ -161,8 +173,10 @@ void glox::code_generator::generate_ast(const std::string &output_folder,
         stream << generate_visitor_function(expression.type_name);
         stream << generate_end_of_class();
 
-        if (!stream.is_open()) {
-            std::cout << "failed to open " << expression.type_name << '\n';
-        }
+//        if (!stream.is_open()) {
+//            std::cout << "failed to open " << expression.type_name << '\n';
+//        }
+
+//        std::cout << stream.str() << '\n';
     }
 }
