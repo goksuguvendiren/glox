@@ -8,6 +8,7 @@
 
 #include "glox.hpp"
 #include "scanner.hpp"
+#include "parser/parser.hpp"
 
 namespace glox
 {
@@ -63,6 +64,8 @@ int glox::runFile(const std::string& filename)
     }
 
     if (had_error) return 1;
+
+    parser::parser parser(tokens);
 
     return 0;
 }

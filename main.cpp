@@ -6,6 +6,7 @@
 #include "glox/representer/opr.hpp"
 #include "glox/representer/binary.hpp"
 #include "glox/token.hpp"
+#include "glox/glox.hpp"
 
 #include "tools/printer.hpp"
 
@@ -24,10 +25,10 @@ void debug_printer()
     std::cerr << printer.to_string(*expr) << '\n';
 }
 
-int main()
+int main(int argc, const char** argv)
 {
-//    glox::glox my_lox;
-//    my_lox.main(argc, argv);
+    glox::glox my_lox;
+    my_lox.main(argc, argv);
 
     std::vector<glox::code_generator::type_definition> types =
     {
