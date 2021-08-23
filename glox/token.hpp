@@ -34,9 +34,10 @@ std::ostream& operator<<(std::ostream& os, const token_type& dt);
 class token
 {
 public:
-    token(token_type type, std::string  lexeme, int line);
+    token(token_type type, std::string lexeme, int line);
 
     std::string get_lexeme() const { return lexeme; }
+    token_type get_type() const { return type; }
 private:
     token_type type;
     std::string lexeme;
