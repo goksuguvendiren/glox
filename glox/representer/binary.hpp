@@ -10,14 +10,13 @@
 
 namespace glox::repr
 {
-	template <class T>
-	class binary : public repr::expression<T>
+	class binary : public repr::expression
 	{
 	public:
 		binary(
-		std::unique_ptr<repr::expression<T>> expr0,
-		std::unique_ptr<repr::opr<T>> expr1,
-		std::unique_ptr<repr::expression<T>> expr2
+		std::unique_ptr<repr::expression> expr0,
+		std::unique_ptr<repr::opr> expr1,
+		std::unique_ptr<repr::expression> expr2
 		) : 
 			expr0(std::move(expr0)),
 			expr1(std::move(expr1)),
@@ -27,11 +26,11 @@ namespace glox::repr
 ~binary() = default;
 
 	private:
-		std::unique_ptr<repr::expression<T>> expr0;
-		std::unique_ptr<repr::opr<T>> expr1;
-		std::unique_ptr<repr::expression<T>> expr2;
+		std::unique_ptr<repr::expression> expr0;
+		std::unique_ptr<repr::opr> expr1;
+		std::unique_ptr<repr::expression> expr2;
 
-		T accept(const visitor<T>& visitor) const
+		std::any accept(const visitor& visitor) const
 		{
 			return visitor.visit_binary_expr(*this);
 		}

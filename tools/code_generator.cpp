@@ -33,8 +33,7 @@ std::string generate_class_definition(const std::string& class_name)
 
     stream << "namespace glox::repr\n";
     stream << "{\n";
-    stream << "\ttemplate <class T>\n";
-    stream << "\tclass " + class_name + " : public repr::expression<T>\n";
+    stream << "\tclass " + class_name + " : public repr::expression\n";
     stream << "\t{\n";
 
     return stream.str();
@@ -52,10 +51,7 @@ std::string generate_end_of_class()
 
 bool gets_template(const std::string& param)
 {
-    if (param == "scanner::token") return false;
-    if (param == "double") return false;
-
-    return true;
+    return false;
 }
 
 bool trivially_copyable(const std::string& param)
@@ -139,7 +135,7 @@ std::string generate_visitor_function(const std::string& class_name)
 {
     std::stringstream stream;
 
-    stream << "\t\tT accept(const visitor<T>& visitor) const\n";
+    stream << "\t\tstd::any accept(const visitor& visitor) const\n";
     stream << "\t\t{\n";
     stream << "\t\t\treturn visitor.visit_" << class_name << "_expr(*this);\n";
     stream << "\t\t}\n";

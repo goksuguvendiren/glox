@@ -8,15 +8,21 @@
 #include "glox/representer/binary.hpp"
 #include "glox/token.hpp"
 
+#include "tools/printer.hpp"
+
 void debug_printer()
 {
-    auto literal_1 = std::make_unique<glox::repr::numeric_literal<double>>(3.);
-    auto literal_2 = std::make_unique<glox::repr::numeric_literal<double>>(5.);
-    auto oper8or   = std::make_unique<glox::repr::opr<double>>(std::make_unique<glox::scanner::token>(glox::scanner::token_type::STAR, "*", 0));
+    auto literal_1 = std::make_unique<glox::repr::numeric_literal>(3.);
+    auto literal_2 = std::make_unique<glox::repr::numeric_literal>(5.);
+    auto oper8or   = std::make_unique<glox::repr::opr>(std::make_unique<glox::scanner::token>(glox::scanner::token_type::STAR, "*", 0));
 
-    auto expr = std::make_unique<glox::repr::binary<double>>(std::move(literal_1),
+    auto expr = std::make_unique<glox::repr::binary>(std::move(literal_1),
             std::move(oper8or),
             std::move(literal_2));
+
+    glox::tools::printer printer;
+
+//    printer.to_string(expr);
 }
 
 int main(int argc, const char** argv)
@@ -32,9 +38,6 @@ int main(int argc, const char** argv)
         {"grouping", {"repr::expression"}},
         {"string_literal", {"std::string"}},
         {"numeric_literal", {"double"}},
-//        {"literal", {"std::string"}},
-//        {"unary", {"glox::scanner::token"}, "glox::repr::expression"}},
-//        {"literal", {""}}
     };
 
     glox::code_generator::generate_ast("/Users/goksuguvendiren/CLionProjects/glox/glox/representer",types);

@@ -10,8 +10,7 @@
 
 namespace glox::repr
 {
-	template <class T>
-	class opr : public repr::expression<T>
+	class opr : public repr::expression
 	{
 	public:
 		opr(
@@ -25,7 +24,7 @@ namespace glox::repr
 	private:
 		std::unique_ptr<scanner::token> expr0;
 
-		T accept(const visitor<T>& visitor) const
+		std::any accept(const visitor& visitor) const
 		{
 			return visitor.visit_opr_expr(*this);
 		}

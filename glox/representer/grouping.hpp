@@ -10,12 +10,11 @@
 
 namespace glox::repr
 {
-	template <class T>
-	class grouping : public repr::expression<T>
+	class grouping : public repr::expression
 	{
 	public:
 		grouping(
-		std::unique_ptr<repr::expression<T>> expr0
+		std::unique_ptr<repr::expression> expr0
 		) : 
 			expr0(std::move(expr0))
 		{}
@@ -23,9 +22,9 @@ namespace glox::repr
 ~grouping() = default;
 
 	private:
-		std::unique_ptr<repr::expression<T>> expr0;
+		std::unique_ptr<repr::expression> expr0;
 
-		T accept(const visitor<T>& visitor) const
+		std::any accept(const visitor& visitor) const
 		{
 			return visitor.visit_grouping_expr(*this);
 		}

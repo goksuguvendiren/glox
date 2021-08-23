@@ -10,8 +10,7 @@
 
 namespace glox::repr
 {
-	template <class T>
-	class numeric_literal : public repr::expression<T>
+	class numeric_literal : public repr::expression
 	{
 	public:
 		numeric_literal(
@@ -25,7 +24,7 @@ namespace glox::repr
 	private:
 		double expr0;
 
-		T accept(const visitor<T>& visitor) const
+		std::any accept(const visitor& visitor) const
 		{
 			return visitor.visit_numeric_literal_expr(*this);
 		}

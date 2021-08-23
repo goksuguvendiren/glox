@@ -9,11 +9,18 @@
 
 namespace glox::tools
 {
-class printer : glox::repr::visitor<std::string>
+class printer : repr::visitor
 {
-    std::string to_string(const glox::repr::expression<std::string>& expr)
+public:
+    std::string to_string(const repr::expression& expr)
     {
-        return expr.accept(*this);
+        return std::any_cast<std::string>(expr.accept(*this));
     }
+
+private:
+    std::any visit_binary_expr(const repr::binary& binary) const;
+    std::any visit_opr_expr(const repr::opr& op) const;
+    std::any visit_numeric_literal_expr(const repr::numeric_literal& op) const;
+
 };
 }
