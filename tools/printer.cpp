@@ -6,6 +6,9 @@
 #include "representer/binary.hpp"
 #include "representer/opr.hpp"
 #include "representer/numeric_literal.hpp"
+#include "representer/string_literal.hpp"
+#include "representer/unary.hpp"
+#include "representer/grouping.hpp"
 
 namespace glox::tools
 {
@@ -30,6 +33,32 @@ std::any printer::visit_binary_expr(const repr::binary& binary) const
     return result;
 }
 
+std::any printer::visit_unary_expr(const repr::unary &op) const
+{
+    const auto& oprtr = op.get_expr1();
+    const auto& operator_token = op.get_expr0().get_type();
+
+    std::string result;
+    result += "( ";
+    result += glox::scanner::to_string(operator_token);
+    result += " ";
+
+    result += to_string(op.get_expr1());
+    result += ")";
+
+    return result;
+}
+
+std::any printer::visit_grouping_expr(const repr::grouping &op) const
+{
+    std::string result;
+    result += "( ";
+    result += to_string(op.get_expr0());
+    result += " )";
+
+    return result;
+}
+
 std::any printer::visit_opr_expr(const repr::opr &op) const
 {
     return op.get_expr0().get_lexeme();
@@ -38,6 +67,11 @@ std::any printer::visit_opr_expr(const repr::opr &op) const
 std::any printer::visit_numeric_literal_expr(const repr::numeric_literal &op) const
 {
     return std::to_string(op.get_expr0());
+}
+
+std::any printer::visit_string_literal_expr(const repr::string_literal &op) const
+{
+    return op.get_expr0();
 }
 
 }
