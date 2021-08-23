@@ -19,7 +19,9 @@ namespace glox::repr
 			expr0(std::move(expr0))
 		{}
 
-~opr() = default;
+		~opr() = default;
+
+		const scanner::token& get_expr0() const { return *expr0; }
 
 	private:
 		std::unique_ptr<scanner::token> expr0;

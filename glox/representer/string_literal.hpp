@@ -19,7 +19,9 @@ namespace glox::repr
 			expr0(std::move(expr0))
 		{}
 
-~string_literal() = default;
+		~string_literal() = default;
+
+		const std::string& get_expr0() const { return *expr0; }
 
 	private:
 		std::unique_ptr<std::string> expr0;

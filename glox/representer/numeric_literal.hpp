@@ -19,7 +19,9 @@ namespace glox::repr
 			expr0(std::move(expr0))
 		{}
 
-~numeric_literal() = default;
+		~numeric_literal() = default;
+
+		const double& get_expr0() const { return expr0; }
 
 	private:
 		double expr0;

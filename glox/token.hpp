@@ -35,6 +35,8 @@ class token
 {
 public:
     token(token_type type, std::string  lexeme, int line);
+
+    std::string get_lexeme() const { return lexeme; }
 private:
     token_type type;
     std::string lexeme;

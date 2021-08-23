@@ -12,7 +12,7 @@ namespace glox::tools
 class printer : repr::visitor
 {
 public:
-    std::string to_string(const repr::expression& expr)
+    std::string to_string(const repr::expression& expr) const
     {
         return std::any_cast<std::string>(expr.accept(*this));
     }
