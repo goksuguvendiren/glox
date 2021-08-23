@@ -161,11 +161,11 @@ bool parser::match(std::vector<scanner::token_type> toks)
     auto current_token = buffer[current].get_type();
     if (std::any_of(toks.begin(), toks.end(), [current_token](const scanner::token_type& tok){return tok == current_token;}))
     {
+        current++;
         return true;
     }
 
-    current++;
-    return true;
+    return false;
 }
 
 scanner::token parser::peek(int offset)
@@ -190,6 +190,11 @@ scanner::token parser::consume(scanner::token_type tok, const std::string& error
     if (match(tok)) advance();
 
     throw std::runtime_error(error_message);
+}
+
+std::unique_ptr<glox::repr::expression> parser::parse()
+{
+    return expression();
 }
 
 }
