@@ -21,12 +21,25 @@ private:
 
     void scan_token();
     bool check_single_tokens(char c);
+    bool check_double_tokens(char c);
+    bool check_more_tokens(char c);
+    bool check_whitespace_tokens(char c);
+    bool check_longer_tokens(char c);
+    bool check_digit_tokens(char c);
+    bool check_identifier_tokens(char c);
+
+
+    void parse_string();
+    void parse_digit();
+    void parse_identifier();
 
     void add_token(scanner::token_type type);
     void add_token(const scanner::token& token);
 
+    bool match(char c);
+    char peek(int offset = 0);
     char advance();
-    bool finished();
+    bool finished(int offset = 0);
 
     int current;
     int start;
