@@ -42,18 +42,14 @@ int glox::runPrompt()
         lexer lexer(line);
         auto tokens = lexer.tokenize();
 
-        for (auto& token : tokens)
-        {
-            std::cout << token << '\n';
-        }
-
+//        for (auto& token : tokens) std::cerr << token << '\n';
         if (had_error) return 1;
 
         parser::parser parser(tokens);
-        auto expression = parser.parse();
+        auto expr = parser.parse();
 
         tools::printer printer;
-        std::cout << printer.to_string(*expression) << '\n';
+        std::cout << printer.to_string(*expr) << '\n';
 
         // set the error to false so that we don't exit the interactive program on
         // a wrong command
@@ -84,7 +80,10 @@ int glox::runFile(const std::string& filename)
     if (had_error) return 1;
 
     parser::parser parser(tokens);
-    parser.parse();
+    auto expr = parser.parse();
+
+    tools::printer printer;
+    std::cerr << printer.to_string(*expr) << '\n';
 
     return 0;
 }

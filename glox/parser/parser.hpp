@@ -27,9 +27,7 @@ class parser
 {
 public:
     explicit parser(const std::vector<scanner::token>& tokens);
-
     std::unique_ptr<repr::expression> parse();
-
 private:
     std::vector<scanner::token> buffer;
 
