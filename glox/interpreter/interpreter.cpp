@@ -13,8 +13,9 @@
 
 namespace glox::interpreter {
 
-std::any interpreter::evaluate(const glox::repr::expression &expr) const {
-    return std::any();
+std::any interpreter::evaluate(const glox::repr::expression &expr) const
+{
+    return expr.accept(*this);
 }
 
 std::any interpreter::visit_numeric_literal_expr(const glox::repr::numeric_literal &numeric) const {

@@ -117,14 +117,9 @@ void glox::report(int line, const std::string &where, const std::string &message
     had_error = true;
 }
 
-value_type glox::to_value(const std::any &value) const
+value_type glox::to_value(const std::any &value)
 {
-    std::unordered_map<std::type_index, value_type> type_names;
-
-    type_names[std::type_index(typeid(double))] = value_type::DOUBLE;
-    type_names[std::type_index(typeid(std::string))] = value_type::STRING;
-
-    return type_names[std::type_index(typeid(value))];
+    return type_names[std::type_index(value.type())];
 }
 
 std::string to_string(const value_type &value)

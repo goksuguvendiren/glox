@@ -5,13 +5,15 @@
 #pragma once
 
 #include <any>
+#include <unordered_map>
+#include <typeindex>
 
 namespace glox {
 
 enum class value_type
 {
+    STRING,
     DOUBLE,
-    STRING
 };
 
 std::string to_string(const value_type& value);
@@ -29,6 +31,12 @@ private:
     void error(int line, const std::string &message);
     void report(int line, const std::string& where, const std::string& message);
 
-    value_type to_value(const std::any& value) const;
+    std::unordered_map<std::type_index, value_type> type_names = {
+            std::make_pair(std::type_index(typeid(double)), value_type::DOUBLE),
+            std::make_pair(std::type_index(typeid(std::string)), value_type::STRING),
+
+    };
+
+    value_type to_value(const std::any& value);
 };
 }
