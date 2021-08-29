@@ -57,7 +57,7 @@ std::unique_ptr<repr::expression> parser::primary()
         return std::make_unique<repr::grouping>(std::move(rest));
     }
 
-    return nullptr;
+    throw std::runtime_error("Expected expression!");
 }
 
 std::unique_ptr<repr::expression> parser::unary()
@@ -65,6 +65,7 @@ std::unique_ptr<repr::expression> parser::unary()
     // this matches a binary operator, read a binary!
     while(match({glox::scanner::token_type::BANG, glox::scanner::token_type::MINUS}))
     {
+        std::cout << "Matched a BANG or a MINUS\n";
         auto curr_operator = std::make_unique<scanner::token>(previous());
         auto right_operand = unary();
 
@@ -159,13 +160,15 @@ bool parser::match(std::vector<scanner::token_type> toks)
     if (finished()) return false;
 
     auto current_token = buffer[current].get_type();
-    if (std::any_of(toks.begin(), toks.end(), [current_token](const scanner::token_type& tok){return tok == current_token;}))
+    if (std::any_of(toks.begin(), toks.end(), [current_token](const scanner::token_type& tok){
+        return tok == current_token;
+    }))
     {
+        current++;
         return true;
     }
 
-    current++;
-    return true;
+    return false;
 }
 
 scanner::token parser::peek(int offset)
@@ -187,9 +190,22 @@ scanner::token parser::previous()
 
 scanner::token parser::consume(scanner::token_type tok, const std::string& error_message)
 {
-    if (match(tok)) advance();
+    if (match(tok)) return advance();
 
     throw std::runtime_error(error_message);
+}
+
+std::unique_ptr<repr::expression> parser::parse()
+{
+    try
+    {
+        return expression();
+    }
+    catch (const std::runtime_error& expression)
+    {
+        std::cerr << expression.what() << '\n';
+        return nullptr;
+    }
 }
 
 }

@@ -25,22 +25,25 @@ void debug_printer()
     std::cerr << printer.to_string(*expr) << '\n';
 }
 
+void auto_generate()
+{
+    std::vector<glox::code_generator::type_definition> types =
+            {
+                    {"binary", {"repr::expression", "repr::opr", "repr::expression"}},
+                    {"opr", {"scanner::token"}},
+                    {"unary", {"scanner::token", "repr::expression"}},
+                    {"grouping", {"repr::expression"}},
+                    {"string_literal", {"std::string"}},
+                    {"numeric_literal", {"double"}},
+            };
+
+    glox::code_generator::generate_ast("/Users/goksuguvendiren/CLionProjects/glox/glox/representer",types);
+}
+
 int main(int argc, const char** argv)
 {
     glox::glox my_lox;
     my_lox.main(argc, argv);
-
-    std::vector<glox::code_generator::type_definition> types =
-    {
-        {"binary", {"repr::expression", "repr::opr", "repr::expression"}},
-        {"opr", {"scanner::token"}},
-        {"unary", {"scanner::token", "repr::expression"}},
-        {"grouping", {"repr::expression"}},
-        {"string_literal", {"std::string"}},
-        {"numeric_literal", {"double"}},
-    };
-
-    glox::code_generator::generate_ast("/Users/goksuguvendiren/CLionProjects/glox/glox/representer",types);
 
     debug_printer();
 }
