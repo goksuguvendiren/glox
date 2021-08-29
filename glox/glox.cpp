@@ -5,10 +5,14 @@
 #include <string>
 #include <iostream>
 #include <fstream>
+#include <unordered_map>
+#include <typeindex>
+#include <any>
 
 #include "glox.hpp"
 #include "scanner.hpp"
 #include "parser/parser.hpp"
+#include "interpreter/interpreter.hpp"
 
 #include "../tools/printer.hpp"
 
@@ -50,6 +54,18 @@ int glox::runPrompt()
 
         tools::printer printer;
         std::cout << printer.to_string(*expr) << '\n';
+
+        interpreter::interpreter interpreter;
+        auto value = interpreter.evaluate(*expr);
+        auto type = to_value(value);
+
+        std::cerr << std::type_index(typeid(double)).name() << '\n';
+        std::cerr << std::type_index(value.type()).name() << '\n';
+
+        std::cerr << "Type of the statement is: " << to_string(type) << '\n';
+        std::cerr << "The value of the statement is: " << std::any_cast<const double&>(value) << '\n';
+
+//        std::cerr << "The evaluated value is: " << std::any_cast<int>(value) << '\n';
 
         // set the error to false so that we don't exit the interactive program on
         // a wrong command
@@ -101,4 +117,27 @@ void glox::report(int line, const std::string &where, const std::string &message
     had_error = true;
 }
 
+value_type glox::to_value(const std::any &value) const
+{
+    std::unordered_map<std::type_index, value_type> type_names;
+
+    type_names[std::type_index(typeid(double))] = value_type::DOUBLE;
+    type_names[std::type_index(typeid(std::string))] = value_type::STRING;
+
+    return type_names[std::type_index(typeid(value))];
+}
+
+std::string to_string(const value_type &value)
+{
+    switch (value)
+    {
+        case value_type::DOUBLE:
+            return "double";
+        case value_type::STRING:
+            return "std::string";
+        default:
+            std::cerr << "No such value_type exists!!!\n";
+            assert(false);
+    }
+}
 }
