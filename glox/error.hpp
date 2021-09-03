@@ -8,7 +8,7 @@
 
 namespace glox
 {
-class err
+class err : std::exception
 {
 public:
     err(int line, const std::string& message);

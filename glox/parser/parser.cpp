@@ -65,8 +65,7 @@ std::unique_ptr<repr::expression> parser::unary()
     // this matches a binary operator, read a binary!
     while(match({glox::scanner::token_type::BANG, glox::scanner::token_type::MINUS}))
     {
-        std::cout << "Matched a BANG or a MINUS\n";
-        auto curr_operator = std::make_unique<scanner::token>(previous());
+        auto curr_operator = std::make_unique<repr::opr>(std::make_unique<scanner::token>(previous()));
         auto right_operand = unary();
 
         return std::make_unique<glox::repr::unary>(std::move(curr_operator), std::move(right_operand));

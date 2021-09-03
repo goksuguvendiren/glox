@@ -40,8 +40,9 @@ int glox::runPrompt()
     std::cout << ">> ";
     while(std::getline(std::cin, line))
     {
-        std::cout << line << '\n';
+//        std::cout << line << '\n';
         std::cout << ">> ";
+        std::flush(std::cout);
 
         lexer lexer(line);
         auto tokens = lexer.tokenize();
@@ -53,17 +54,12 @@ int glox::runPrompt()
         auto expr = parser.parse();
 
         tools::printer printer;
-        std::cout << printer.to_string(*expr) << '\n';
+//        std::cout << printer.to_string(*expr) << '\n';
 
         interpreter::interpreter interpreter;
         auto value = interpreter.evaluate(*expr);
-        auto type = to_value(value);
 
-        std::cerr << std::type_index(typeid(double)).name() << '\n';
-        std::cerr << std::type_index(value.type()).name() << '\n';
-
-        std::cerr << "Type of the statement is: " << to_string(type) << '\n';
-        std::cerr << "The value of the statement is: " << std::any_cast<const double&>(value) << '\n';
+        std::cout << std::any_cast<double>(value) << '\n';
 
 //        std::cerr << "The evaluated value is: " << std::any_cast<int>(value) << '\n';
 
@@ -117,7 +113,7 @@ void glox::report(int line, const std::string &where, const std::string &message
     had_error = true;
 }
 
-value_type glox::to_value(const std::any &value)
+value_type glox::to_type(const std::any &value)
 {
     return type_names[std::type_index(value.type())];
 }
@@ -130,6 +126,8 @@ std::string to_string(const value_type &value)
             return "double";
         case value_type::STRING:
             return "std::string";
+        case value_type::BOOLEAN:
+            return "bool";
         default:
             std::cerr << "No such value_type exists!!!\n";
             assert(false);

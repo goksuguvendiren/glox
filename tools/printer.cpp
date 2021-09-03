@@ -53,7 +53,7 @@ std::any printer::visit_unary_expr(const repr::unary &op) const
     std::string result;
 
     result += "( ";
-    result += token.get_lexeme();
+    result += token.get_expr0().get_lexeme();
     result += " ";
     result += to_string(value);
     result += " )";
