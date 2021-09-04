@@ -60,6 +60,31 @@ std::any interpreter::visit_binary_expr(const repr::binary &binary) const
             check_type(value_type::DOUBLE, right_operand, "Binary expressions expect to get a double as right operand!");
             return std::any_cast<double>(left_operand) * std::any_cast<double>(right_operand);
 
+        case scanner::token_type::GREATER:
+            check_type(value_type::DOUBLE, left_operand, "Binary expressions expect to get a double as left operand!");
+            check_type(value_type::DOUBLE, right_operand, "Binary expressions expect to get a double as right operand!");
+            return std::any_cast<double>(left_operand) > std::any_cast<double>(right_operand);
+
+        case scanner::token_type::GREATER_EQUAL:
+            check_type(value_type::DOUBLE, left_operand, "Binary expressions expect to get a double as left operand!");
+            check_type(value_type::DOUBLE, right_operand, "Binary expressions expect to get a double as right operand!");
+            return std::any_cast<double>(left_operand) >= std::any_cast<double>(right_operand);
+
+        case scanner::token_type::LESS:
+            check_type(value_type::DOUBLE, left_operand, "Binary expressions expect to get a double as left operand!");
+            check_type(value_type::DOUBLE, right_operand, "Binary expressions expect to get a double as right operand!");
+            return std::any_cast<double>(left_operand) < std::any_cast<double>(right_operand);
+
+        case scanner::token_type::LESS_EQUAL:
+            check_type(value_type::DOUBLE, left_operand, "Binary expressions expect to get a double as left operand!");
+            check_type(value_type::DOUBLE, right_operand, "Binary expressions expect to get a double as right operand!");
+            return std::any_cast<double>(left_operand) <= std::any_cast<double>(right_operand);
+
+        case scanner::token_type::EQUAL_EQUAL:
+            check_type(value_type::DOUBLE, left_operand, "Binary expressions expect to get a double as left operand!");
+            check_type(value_type::DOUBLE, right_operand, "Binary expressions expect to get a double as right operand!");
+            return std::any_cast<double>(left_operand) == std::any_cast<double>(right_operand);
+
         case scanner::token_type::PLUS:
         {
             if (glox::to_type(left_operand) == value_type::STRING)
