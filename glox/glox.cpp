@@ -32,6 +32,26 @@ int glox::main(int argc, const char **argv)
     return 0;
 }
 
+int glox::run(const std::string& contents)
+{
+    lexer lexer(contents);
+    auto tokens = lexer.tokenize();
+
+//    for (auto& token : tokens) std::cout << token << '\n';
+
+    if (had_error) return 1;
+
+    parser::parser parser(tokens);
+    auto statements = parser.parse();
+    tools::printer printer;
+//    for (auto& statement : statements) std::cerr << printer.to_string(*statement) << '\n';
+
+    interpreter::interpreter interpreter;
+    interpreter.interpret(statements);
+
+    return 0;
+}
+
 int glox::runPrompt()
 {
     std::cout << "Running the glox online interpreter!\n";
@@ -40,28 +60,10 @@ int glox::runPrompt()
     std::cout << ">> ";
     while(std::getline(std::cin, line))
     {
-//        std::cout << line << '\n';
         std::cout << ">> ";
         std::flush(std::cout);
 
-        lexer lexer(line);
-        auto tokens = lexer.tokenize();
-
-//        for (auto& token : tokens) std::cerr << token << '\n';
-        if (had_error) return 1;
-
-        parser::parser parser(tokens);
-        auto expr = parser.parse();
-
-        tools::printer printer;
-//        std::cout << printer.to_string(*expr) << '\n';
-
-        interpreter::interpreter interpreter;
-        auto value = interpreter.evaluate(*expr);
-
-        std::cout << std::any_cast<double>(value) << '\n';
-
-//        std::cerr << "The evaluated value is: " << std::any_cast<int>(value) << '\n';
+        run(line);
 
         // set the error to false so that we don't exit the interactive program on
         // a wrong command
@@ -73,29 +75,15 @@ int glox::runPrompt()
 
 int glox::runFile(const std::string& filename)
 {
-    std::cout << "Processing and executing the file: " << filename << '\n';
+//    std::cout << "Processing and executing the file: " << filename << '\n';
 
     std::ifstream in(filename);
     std::string contents((std::istreambuf_iterator<char>(in)),
                          std::istreambuf_iterator<char>());
 
-    std::cout << contents.c_str() << '\n';
+//    std::cout << contents.c_str() << '\n';
 
-    lexer lexer(contents);
-    auto tokens = lexer.tokenize();
-
-    for (auto& token : tokens)
-    {
-        std::cout << token << '\n';
-    }
-
-    if (had_error) return 1;
-
-    parser::parser parser(tokens);
-    auto expr = parser.parse();
-
-    tools::printer printer;
-    std::cerr << printer.to_string(*expr) << '\n';
+    run(contents);
 
     return 0;
 }

@@ -4,6 +4,8 @@
 
 #include <glox.hpp>
 #include <iostream>
+#include <memory>
+#include <vector>
 #include "interpreter.hpp"
 #include "error.hpp"
 
@@ -14,6 +16,10 @@
 #include "representer/unary.hpp"
 #include "representer/grouping.hpp"
 
+#include "statements/print.hpp"
+#include "statements/expression.hpp"
+#include "statements/statement.hpp"
+
 namespace glox::interpreter {
 
 bool check_type(value_type type, const std::any& value, const std::string& message)
@@ -22,6 +28,29 @@ bool check_type(value_type type, const std::any& value, const std::string& messa
     if (type_of_value == type) return true;
 
     throw err(0, message);
+}
+
+
+std::any interpreter::interpret(const std::vector<std::unique_ptr<stmt::statement>> &statements) const
+{
+    try
+    {
+        for (const auto& statement : statements)
+        {
+            execute(statement);
+        }
+    }
+    catch(const std::runtime_error& error)
+    {
+        throw err(0, error.what());
+    }
+
+    return 0;
+}
+
+std::any interpreter::execute(const std::unique_ptr<stmt::statement>& statement) const
+{
+    return statement->accept(*this);
 }
 
 std::any interpreter::evaluate(const repr::expression &expr) const
@@ -144,5 +173,21 @@ std::any interpreter::visit_unary_expr(const repr::unary &unary) const
 std::any interpreter::visit_grouping_expr(const repr::grouping &group) const
 {
     return evaluate(group.get_expr0());
+}
+
+std::any interpreter::visit_print_statement(const stmt::print &st) const
+{
+    auto value = evaluate(st.get_expr0());
+
+    std::cout << std::any_cast<double>(value) << '\n';
+
+    return std::nullopt;
+}
+
+std::any interpreter::visit_expression_statement(const stmt::expression &st) const
+{
+    evaluate(st.get_expr0());
+
+    return std::nullopt;
 }
 }

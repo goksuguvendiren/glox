@@ -9,6 +9,8 @@
 #include <typeindex>
 #include <string>
 
+#include "statements/statement.hpp"
+
 namespace glox {
 
 enum class value_type
@@ -34,6 +36,8 @@ public:
 private:
     int runPrompt();
     int runFile(const std::string& filename);
+
+    int run(const std::string& statements);
 
     bool had_error = false;
 

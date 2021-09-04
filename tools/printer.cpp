@@ -12,6 +12,9 @@
 #include "representer/unary.hpp"
 #include "representer/grouping.hpp"
 
+#include "statements/expression.hpp"
+#include "statements/print.hpp"
+
 namespace glox::tools
 {
 std::any printer::visit_binary_expr(const repr::binary& binary) const
@@ -69,6 +72,16 @@ std::any printer::visit_grouping_expr(const repr::grouping &op) const
 std::any printer::visit_string_literal_expr(const repr::string_literal &op) const
 {
     return op.get_expr0();
+}
+
+std::any printer::visit_print_statement(const stmt::print &st) const
+{
+    return "PRINT " +  to_string(st.get_expr0());
+}
+
+std::any printer::visit_expression_statement(const stmt::expression &st) const
+{
+    return to_string(st.get_expr0());
 }
 
 }

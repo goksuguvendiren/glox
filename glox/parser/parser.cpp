@@ -17,6 +17,10 @@
 #include "representer/unary.hpp"
 #include "representer/numeric_literal.hpp"
 
+#include "statements/statement.hpp"
+#include "statements/print.hpp"
+#include "statements/expression.hpp"
+
 namespace glox::parser
 {
 /*
@@ -32,6 +36,10 @@ namespace glox::parser
  */
 
 parser::parser(const std::vector<scanner::token> &tokens) : buffer(tokens) {}
+
+/*
+ * Parse the expressions
+ */
 
 std::unique_ptr<repr::expression> parser::primary()
 {
@@ -144,6 +152,57 @@ std::unique_ptr<glox::repr::expression> parser::expression()
     return equality();
 }
 
+/*
+ * Parse the statements
+ */
+
+std::unique_ptr<glox::stmt::statement> parser::expression_statement()
+{
+    auto val = expression(); // parse the next token after `print`
+    consume(scanner::token_type::SEMICOLON, "Expected ';' after expression!!");
+
+    return std::make_unique<stmt::expression>(std::move(val));
+}
+
+std::unique_ptr<glox::stmt::statement> parser::print_statement()
+{
+    auto val = expression(); // parse the next token after `print`
+    consume(scanner::token_type::SEMICOLON, "Expected ';' after expression!!");
+
+    return std::make_unique<stmt::print>(std::move(val));
+}
+
+std::unique_ptr<glox::stmt::statement> parser::statement()
+{
+    if (match(scanner::token_type::PRINT))
+        return print_statement();
+
+    return expression_statement();
+}
+
+std::vector<std::unique_ptr<stmt::statement>> parser::parse()
+{
+    std::vector<std::unique_ptr<stmt::statement>> statements;
+    try
+    {
+        while(!finished() && peek().get_type() != scanner::token_type::ENOF)
+        {
+            auto expr = statement();
+            statements.push_back(std::move(expr));
+        }
+    }
+    catch (const std::runtime_error& expression)
+    {
+        std::cerr << expression.what() << '\n';
+        return {};
+    }
+
+    return statements;
+}
+
+/*
+ * The helper functions:
+ */
 bool parser::finished(int offset)
 {
     return current + offset >= buffer.size();
@@ -189,22 +248,8 @@ scanner::token parser::previous()
 
 scanner::token parser::consume(scanner::token_type tok, const std::string& error_message)
 {
-    if (match(tok)) return advance();
+    if (peek().get_type() == tok) return advance();
 
     throw std::runtime_error(error_message);
 }
-
-std::unique_ptr<repr::expression> parser::parse()
-{
-    try
-    {
-        return expression();
-    }
-    catch (const std::runtime_error& expression)
-    {
-        std::cerr << expression.what() << '\n';
-        return nullptr;
-    }
-}
-
 }

@@ -5,6 +5,7 @@
 #pragma once
 
 #include <vector>
+#include <statements/statement.hpp>
 #include "representer/expression.hpp"
 #include "token.hpp"
 
@@ -27,7 +28,7 @@ class parser
 {
 public:
     explicit parser(const std::vector<scanner::token>& tokens);
-    std::unique_ptr<repr::expression> parse();
+    std::vector<std::unique_ptr<stmt::statement>> parse();
 private:
     std::vector<scanner::token> buffer;
 
@@ -38,6 +39,10 @@ private:
     std::unique_ptr<repr::expression> comparison();
     std::unique_ptr<repr::expression> equality();
     std::unique_ptr<repr::expression> expression();
+
+    std::unique_ptr<stmt::statement> expression_statement();
+    std::unique_ptr<stmt::statement> print_statement();
+    std::unique_ptr<stmt::statement> statement();
 
     bool match(std::vector<scanner::token_type> tok);
     bool match(scanner::token_type tok);
