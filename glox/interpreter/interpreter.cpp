@@ -15,10 +15,12 @@
 #include "representer/string_literal.hpp"
 #include "representer/unary.hpp"
 #include "representer/grouping.hpp"
+#include "representer/variable.hpp"
 
 #include "statements/print.hpp"
 #include "statements/expression.hpp"
 #include "statements/statement.hpp"
+#include "statements/variable.hpp"
 
 namespace glox::interpreter {
 
@@ -175,6 +177,12 @@ std::any interpreter::visit_grouping_expr(const repr::grouping &group) const
     return evaluate(group.get_expr0());
 }
 
+std::any interpreter::visit_variable_expr(const repr::variable &op) const
+{
+    assert(false);
+    return std::any();
+}
+
 std::any interpreter::visit_print_statement(const stmt::print &st) const
 {
     auto value = evaluate(st.get_expr0());
@@ -187,6 +195,18 @@ std::any interpreter::visit_print_statement(const stmt::print &st) const
 std::any interpreter::visit_expression_statement(const stmt::expression &st) const
 {
     evaluate(st.get_expr0());
+
+    return std::nullopt;
+}
+
+std::any interpreter::visit_variable_statement(const stmt::variable &variable) const
+{
+    std::any value = std::nullopt;
+    auto var_name = variable.get_expr0().get_lexeme();
+
+    if (variable.initialized()) value = evaluate(variable.get_expr1());
+
+    environnment.add(var_name, value, glox::to_type(value));
 
     return std::nullopt;
 }

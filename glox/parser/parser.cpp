@@ -16,10 +16,12 @@
 #include "representer/binary.hpp"
 #include "representer/unary.hpp"
 #include "representer/numeric_literal.hpp"
+#include "representer/variable.hpp"
 
 #include "statements/statement.hpp"
 #include "statements/print.hpp"
 #include "statements/expression.hpp"
+#include "statements/variable.hpp"
 
 namespace glox::parser
 {
@@ -63,6 +65,11 @@ std::unique_ptr<repr::expression> parser::primary()
         consume(scanner::token_type::RIGHT_PAREN, "Expected ')' after expression!!");
 
         return std::make_unique<repr::grouping>(std::move(rest));
+    }
+
+    if (match(scanner::token_type::IDENTIFIER))
+    {
+        return std::make_unique<repr::variable>(std::make_unique<scanner::token>(previous()));
     }
 
     return nullptr;
@@ -180,6 +187,28 @@ std::unique_ptr<glox::stmt::statement> parser::statement()
     return expression_statement();
 }
 
+std::unique_ptr<stmt::statement> parser::variable_declaration()
+{
+    auto variable_name = consume(scanner::token_type::IDENTIFIER, "Variable declarations should have a name!");
+
+    std::unique_ptr<repr::expression> value = nullptr;
+    if (match(scanner::token_type::EQUAL))
+    {
+        value = expression();
+    }
+
+    consume(scanner::token_type::SEMICOLON, "Expected ';' variable declaration!!");
+    return std::make_unique<stmt::variable>(std::make_unique<scanner::token>(variable_name), std::move(value));
+}
+
+std::unique_ptr<stmt::statement> parser::declaration()
+{
+    if (match(scanner::token_type::VAR))
+        return variable_declaration();
+
+    return statement();
+}
+
 std::vector<std::unique_ptr<stmt::statement>> parser::parse()
 {
     std::vector<std::unique_ptr<stmt::statement>> statements;
@@ -187,7 +216,7 @@ std::vector<std::unique_ptr<stmt::statement>> parser::parse()
     {
         while(!finished() && peek().get_type() != scanner::token_type::ENOF)
         {
-            auto expr = statement();
+            auto expr = declaration();
             statements.push_back(std::move(expr));
         }
     }

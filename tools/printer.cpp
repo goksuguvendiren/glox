@@ -74,6 +74,12 @@ std::any printer::visit_string_literal_expr(const repr::string_literal &op) cons
     return op.get_expr0();
 }
 
+std::any printer::visit_variable_expr(const repr::variable &op) const
+{
+    assert(false);
+    return std::any();
+}
+
 std::any printer::visit_print_statement(const stmt::print &st) const
 {
     return "PRINT " +  to_string(st.get_expr0());
@@ -84,4 +90,8 @@ std::any printer::visit_expression_statement(const stmt::expression &st) const
     return to_string(st.get_expr0());
 }
 
+std::any glox::tools::printer::visit_variable_statement(const glox::stmt::variable &st) const
+{
+    return std::any();
+}
 }

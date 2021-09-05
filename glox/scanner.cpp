@@ -14,7 +14,6 @@ std::vector<scanner::token> lexer::tokenize()
 {
     while (!finished())
     {
-        start = current;
         scan_token();
     }
 
@@ -137,60 +136,30 @@ bool lexer::check_identifier_tokens(char c)
 
 void lexer::scan_token()
 {
+    start = current;
+
     auto c = advance();
     auto res = check_single_tokens(c);
-    if (res)
-    {
-//        std::cout << "Found a single character token!\n";
-        return;
-    }
+    if (res) return;
 
     res = check_double_tokens(c);
-    if (res)
-    {
-//        std::cout << "Found a double character token!\n";
-        return;
-    }
+    if (res) return;
 
     res = check_more_tokens(c);
-    if (res)
-    {
-//        std::cout << "Found a one or more character token!\n";
-        return;
-    }
+    if (res) return;
 
     res = check_whitespace_tokens(c);
-    if (res)
-    {
-//        std::cout << "Found a whitespace!\n";
-        return;
-    }
+    if (res) return;
 
     res = check_longer_tokens(c);
-    if (res)
-    {
-//        std::cout << "Found longer tokens!\n";
-        return;
-    }
+    if (res) return;
 
     res = check_digit_tokens(c);
-    if (res)
-    {
-//        std::cout << "Found digit token!\n";
-        return;
-    }
+    if (res) return;
 
     res = check_identifier_tokens(c);
-
-    if (res)
-    {
-//        std::cout << "Found digit token!\n";
-        return;
-    }
-    else
-    {
-        err(line, "An unexpected character was given!");
-    }
+    if (res) return;
+    else err(line, "An unexpected character was given!");
 }
 
 char lexer::advance()
@@ -312,6 +281,12 @@ void lexer::parse_identifier()
     auto identifier = get_identifier(lexeme);
 
     add_token(identifier);
+}
+
+scanner::token lexer::advance_token()
+{
+    if (current_token >= tokens.size()) throw err(0, "Overflows the tokens!");
+    return tokens[current_token++];
 }
 
 }

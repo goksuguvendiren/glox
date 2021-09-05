@@ -10,12 +10,14 @@ namespace glox::stmt
 {
 class print;
 class expression;
+class variable;
 
 class visitor
 {
 public:
     virtual std::any visit_print_statement(const stmt::print& st) const = 0;
     virtual std::any visit_expression_statement(const stmt::expression& st) const = 0;
+    virtual std::any visit_variable_statement(const stmt::variable& st) const = 0;
 };
 
 class statement

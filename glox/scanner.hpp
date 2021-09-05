@@ -14,12 +14,13 @@ class lexer
 public:
     explicit lexer(std::string buf);
     std::vector<scanner::token> tokenize();
+    void scan_token();
+    scanner::token advance_token();
 
 private:
     std::string buffer;
     std::vector<scanner::token> tokens;
 
-    void scan_token();
     bool check_single_tokens(char c);
     bool check_double_tokens(char c);
     bool check_more_tokens(char c);
@@ -27,7 +28,6 @@ private:
     bool check_longer_tokens(char c);
     bool check_digit_tokens(char c);
     bool check_identifier_tokens(char c);
-
 
     void parse_string();
     void parse_digit();
@@ -44,5 +44,7 @@ private:
     int current;
     int start;
     int line;
+
+    int current_token = 0;
 };
 }
