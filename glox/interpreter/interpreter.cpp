@@ -6,6 +6,7 @@
 #include <iostream>
 #include <memory>
 #include <vector>
+
 #include "interpreter.hpp"
 #include "error.hpp"
 
@@ -16,6 +17,7 @@
 #include "representer/unary.hpp"
 #include "representer/grouping.hpp"
 #include "representer/variable.hpp"
+#include "representer/assignment.hpp"
 
 #include "statements/print.hpp"
 #include "statements/expression.hpp"
@@ -32,14 +34,15 @@ bool check_type(value_type type, const std::any& value, const std::string& messa
     throw err(0, message);
 }
 
-
-std::any interpreter::interpret(const std::vector<std::unique_ptr<stmt::statement>> &statements) const
+std::vector<std::any> interpreter::interpret(const std::vector<std::unique_ptr<stmt::statement>> &statements) const
 {
+    std::vector<std::any> results;
     try
     {
         for (const auto& statement : statements)
         {
-            execute(statement);
+            auto res = execute(statement);
+            results.push_back(res);
         }
     }
     catch(const std::runtime_error& error)
@@ -47,7 +50,7 @@ std::any interpreter::interpret(const std::vector<std::unique_ptr<stmt::statemen
         throw err(0, error.what());
     }
 
-    return 0;
+    return results;
 }
 
 std::any interpreter::execute(const std::unique_ptr<stmt::statement>& statement) const
@@ -177,10 +180,10 @@ std::any interpreter::visit_grouping_expr(const repr::grouping &group) const
     return evaluate(group.get_expr0());
 }
 
-std::any interpreter::visit_variable_expr(const repr::variable &op) const
+std::any interpreter::visit_variable_expr(const repr::variable &variable) const
 {
-    assert(false);
-    return std::any();
+    auto variable_name = variable.get_expr0().get_lexeme();
+    return environment.read(variable_name);
 }
 
 std::any interpreter::visit_print_statement(const stmt::print &st) const
@@ -189,14 +192,14 @@ std::any interpreter::visit_print_statement(const stmt::print &st) const
 
     std::cout << std::any_cast<double>(value) << '\n';
 
-    return std::nullopt;
+    return 0;
 }
 
 std::any interpreter::visit_expression_statement(const stmt::expression &st) const
 {
     evaluate(st.get_expr0());
 
-    return std::nullopt;
+    return 0;
 }
 
 std::any interpreter::visit_variable_statement(const stmt::variable &variable) const
@@ -206,8 +209,26 @@ std::any interpreter::visit_variable_statement(const stmt::variable &variable) c
 
     if (variable.initialized()) value = evaluate(variable.get_expr1());
 
-    environnment.add(var_name, value, glox::to_type(value));
+    environment.write(var_name, value, glox::to_type(value));
 
-    return std::nullopt;
+    return 0;
+}
+
+std::any interpreter::visit_assignment_expr(const repr::assignment &assignment) const
+{
+    auto var_name = assignment.get_expr0().get_lexeme();
+    std::any value = evaluate(assignment.get_expr1());
+
+    if (environment.exists(var_name))
+    {
+        environment.write(var_name, value, glox::to_type(value));
+    }
+    else
+    {
+        throw err(assignment.get_expr0().get_line(), "Tried to write to a variable that doesn't exist: " + var_name);
+        return 1;
+    }
+
+    return 0;
 }
 }

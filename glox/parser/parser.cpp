@@ -9,6 +9,8 @@
 #include <representer/opr.hpp>
 #include <representer/string_literal.hpp>
 #include <representer/grouping.hpp>
+#include <representer/assignment.hpp>
+#include <error.hpp>
 
 #include "token.hpp"
 #include "parser/parser.hpp"
@@ -91,7 +93,7 @@ std::unique_ptr<repr::expression> parser::unary()
 
 std::unique_ptr<repr::expression> parser::factor()
 {
-    std::unique_ptr<glox::repr::expression> left_operand = unary();
+    auto left_operand = unary();
 
     // this matches a binary operator, read a binary!
     while(match({glox::scanner::token_type::SLASH, glox::scanner::token_type::STAR}))
@@ -107,7 +109,7 @@ std::unique_ptr<repr::expression> parser::factor()
 
 std::unique_ptr<repr::expression> parser::term()
 {
-    std::unique_ptr<glox::repr::expression> left_operand = factor();
+    auto left_operand = factor();
 
     // this matches a binary operator, read a binary!
     while(match({glox::scanner::token_type::PLUS, glox::scanner::token_type::MINUS}))
@@ -123,7 +125,7 @@ std::unique_ptr<repr::expression> parser::term()
 
 std::unique_ptr<glox::repr::expression> parser::comparison()
 {
-    std::unique_ptr<glox::repr::expression> left_term = term();
+    auto left_term = term();
 
     // this matches a binary operator, read a binary!
     while(match({glox::scanner::token_type::GREATER, glox::scanner::token_type::GREATER_EQUAL,
@@ -140,7 +142,7 @@ std::unique_ptr<glox::repr::expression> parser::comparison()
 
 std::unique_ptr<glox::repr::expression> parser::equality()
 {
-    std::unique_ptr<glox::repr::expression> left_operand = comparison();
+    auto left_operand = comparison();
 
     // this matches a binary operator, read a binary!
     while(match({glox::scanner::token_type::BANG_EQUAL, glox::scanner::token_type::EQUAL_EQUAL}))
@@ -154,9 +156,36 @@ std::unique_ptr<glox::repr::expression> parser::equality()
     return left_operand;
 }
 
+std::unique_ptr<glox::repr::expression> parser::assignment()
+{
+    auto left_operand = equality();
+
+    // this matches an assignment expression, read an assignment!
+    if(match(glox::scanner::token_type::EQUAL))
+    {
+        auto token = previous();
+        auto right_operand = assignment(); // a = b = c = 3; should be parsable
+
+        auto variable = dynamic_cast<repr::variable*>(left_operand.get());
+
+        if (variable)
+        {
+            // correct, keep on lexing
+            auto name = variable->get_expr0();
+            return std::make_unique<glox::repr::assignment>(std::make_unique<scanner::token>(name), std::move(right_operand));
+        }
+        else
+        {
+            throw err(0, "Invalid assignment!!");
+        }
+    }
+
+    return left_operand;
+}
+
 std::unique_ptr<glox::repr::expression> parser::expression()
 {
-    return equality();
+    return assignment();
 }
 
 /*
@@ -220,10 +249,10 @@ std::vector<std::unique_ptr<stmt::statement>> parser::parse()
             statements.push_back(std::move(expr));
         }
     }
-    catch (const std::runtime_error& expression)
+    catch (const std::runtime_error& exception)
     {
-        std::cerr << expression.what() << '\n';
-        return {};
+        std::cerr << exception.what() << '\n';
+        throw exception;
     }
 
     return statements;

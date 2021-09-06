@@ -14,7 +14,7 @@ add_library(gloxlib glox/glox.cpp glox/scanner.cpp glox/token.cpp glox/error.cpp
 target_include_directories(gloxlib PUBLIC glox)
 target_compile_features(gloxlib PUBLIC cxx_std_20)
 
-add_executable(glox main.cpp)
+add_executable(glox main.cpp glox/representer/assignment.hpp)
 target_link_libraries(glox PRIVATE gloxlib)
 
 enable_testing()

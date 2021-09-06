@@ -31,6 +31,7 @@ private:
     std::any visit_unary_expr(const repr::unary& op) const;
     std::any visit_grouping_expr(const repr::grouping& op) const;
     std::any visit_variable_expr(const repr::variable& op) const;
+    std::any visit_assignment_expr(const repr::assignment& op) const;
 
     std::any visit_print_statement(const stmt::print& st) const;
     std::any visit_expression_statement(const stmt::expression& st) const;

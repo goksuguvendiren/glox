@@ -94,4 +94,10 @@ std::any glox::tools::printer::visit_variable_statement(const glox::stmt::variab
 {
     return std::any();
 }
+
+std::any printer::visit_assignment_expr(const repr::assignment &op) const
+{
+    assert(false);
+    return std::any();
+}
 }

@@ -15,6 +15,7 @@ class numeric_literal;
 class string_literal;
 class grouping;
 class variable;
+class assignment;
 
 class visitor
 {
@@ -26,6 +27,7 @@ public:
     virtual std::any visit_string_literal_expr(const repr::string_literal& op) const = 0;
     virtual std::any visit_grouping_expr(const repr::grouping& op) const = 0;
     virtual std::any visit_variable_expr(const repr::variable& op) const = 0;
+    virtual std::any visit_assignment_expr(const repr::assignment& op) const = 0;
 };
 
 class expression

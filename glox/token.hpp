@@ -38,6 +38,9 @@ public:
 
     [[nodiscard]] std::string get_lexeme() const { return lexeme; }
     [[nodiscard]] token_type get_type() const { return type; }
+
+    int get_line() const { return line; }
+
 private:
     token_type type;
     std::string lexeme;
@@ -45,5 +48,7 @@ private:
 
     friend std::ostream& operator<<(std::ostream& os, const token& dt);
 };
+
+inline bool operator==(const token& lhs, const token& rhs) { return lhs.get_lexeme() == rhs.get_lexeme() && lhs.get_type() == rhs.get_type(); }
 
 }

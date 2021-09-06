@@ -38,6 +38,7 @@ private:
     std::unique_ptr<repr::expression> term();
     std::unique_ptr<repr::expression> comparison();
     std::unique_ptr<repr::expression> equality();
+    std::unique_ptr<repr::expression> assignment();
     std::unique_ptr<repr::expression> expression();
 
     std::unique_ptr<stmt::statement> expression_statement();

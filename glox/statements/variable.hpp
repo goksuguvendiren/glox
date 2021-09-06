@@ -19,7 +19,7 @@ class variable : public stmt::statement
 		) :
 			expr0(std::move(expr0)),
 			expr1(std::move(expr1)),
-			initd(expr1 != nullptr)
+			initd(this->expr1 != nullptr)
 		{}
 
 		~variable() = default;

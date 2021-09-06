@@ -10,25 +10,26 @@
 
 namespace glox::repr
 {
-	class numeric_literal : public repr::expression
-	{
-	public:
-		numeric_literal(
-		double expr0
-		) : 
-			expr0(std::move(expr0))
-		{}
+class numeric_literal : public repr::expression
+{
+public:
+    numeric_literal(
+    double expr0
+    ) :
+        expr0(std::move(expr0))
+    {}
 
-		~numeric_literal() = default;
+    ~numeric_literal() = default;
 
-		const double& get_expr0() const { return expr0; }
+    const double& get_expr0() const { return expr0; }
 
-	private:
-		double expr0;
+private:
+    double expr0;
 
-		std::any accept(const visitor& visitor) const
-		{
-			return visitor.visit_numeric_literal_expr(*this);
-		}
-	};
+    std::any accept(const visitor& visitor) const
+    {
+        return visitor.visit_numeric_literal_expr(*this);
+    }
+};
+inline bool operator==(const numeric_literal& lhs, const numeric_literal& rhs) { return lhs.get_expr0() == rhs.get_expr0(); }
 }
