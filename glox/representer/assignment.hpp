@@ -32,7 +32,7 @@ private:
 
     std::any accept(const visitor& visitor) const
     {
-        return visitor.visit_assignment_expr(*this);
+        return visitor.visit_assignment_expr(this);
     }
 };
 }

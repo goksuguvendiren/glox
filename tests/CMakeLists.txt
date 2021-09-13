@@ -16,3 +16,7 @@ add_test(NAME parser_tests COMMAND parser_tests)
 add_executable(interpreter_tests interpreter_tests.cpp)
 target_link_libraries(interpreter_tests gloxlib tests_main)
 add_test(NAME interpreter_tests COMMAND interpreter_tests)
+
+add_executable(printer_tests printer_tests.cpp)
+target_link_libraries(printer_tests gloxlib tests_main)
+add_test(NAME printer_tests COMMAND printer_tests)

@@ -43,6 +43,7 @@ private:
 
     std::unique_ptr<stmt::statement> expression_statement();
     std::unique_ptr<stmt::statement> print_statement();
+    std::unique_ptr<stmt::statement> block_statement();
     std::unique_ptr<stmt::statement> statement();
     std::unique_ptr<stmt::statement> variable_declaration();
     std::unique_ptr<stmt::statement> declaration();

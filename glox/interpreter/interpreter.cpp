@@ -23,8 +23,14 @@
 #include "statements/expression.hpp"
 #include "statements/statement.hpp"
 #include "statements/variable.hpp"
+#include "statements/block.hpp"
+#include "../../tools/printer.hpp"
 
 namespace glox::interpreter {
+
+// initialize the static variables:
+stmt::environment* interpreter::current_environment = nullptr;
+std::list<std::unique_ptr<stmt::environment>> interpreter::all_envs = {};
 
 bool check_type(value_type type, const std::any& value, const std::string& message)
 {
@@ -41,7 +47,7 @@ std::vector<std::any> interpreter::interpret(const std::vector<std::unique_ptr<s
     {
         for (const auto& statement : statements)
         {
-            auto res = execute(statement);
+            auto res = execute(statement.get());
             results.push_back(res);
         }
     }
@@ -53,29 +59,32 @@ std::vector<std::any> interpreter::interpret(const std::vector<std::unique_ptr<s
     return results;
 }
 
-std::any interpreter::execute(const std::unique_ptr<stmt::statement>& statement) const
+std::any interpreter::execute(const stmt::statement* statement) const
 {
+//    tools::printer printer;
+//    std::cout << printer.to_string(statement) << '\n';
+
     return statement->accept(*this);
 }
 
-std::any interpreter::evaluate(const repr::expression &expr) const
+std::any interpreter::evaluate(const repr::expression* expr) const
 {
-    return expr.accept(*this);
+    return expr->accept(*this);
 }
 
-std::any interpreter::visit_numeric_literal_expr(const repr::numeric_literal &numeric) const
+std::any interpreter::visit_numeric_literal_expr(const repr::numeric_literal* numeric) const
 {
     // for numeric literals, return the double value.
-    check_type(value_type::DOUBLE, numeric.get_expr0(), "Numeric literal expects to get a double!");
-    return numeric.get_expr0();
+    check_type(value_type::DOUBLE, numeric->get_expr0(), "Numeric literal expects to get a double!");
+    return numeric->get_expr0();
 }
 
-std::any interpreter::visit_binary_expr(const repr::binary &binary) const
+std::any interpreter::visit_binary_expr(const repr::binary* binary) const
 {
-    auto left_operand  = evaluate(binary.get_expr0());
-    auto right_operand = evaluate(binary.get_expr2());
+    auto left_operand  = evaluate(&binary->get_expr0());
+    auto right_operand = evaluate(&binary->get_expr2());
 
-    const auto& oper8or = binary.get_expr1();
+    const auto& oper8or = binary->get_expr1();
 
     switch (oper8or.get_expr0().get_type())
     {
@@ -141,14 +150,14 @@ std::any interpreter::visit_binary_expr(const repr::binary &binary) const
     }
 }
 
-std::any interpreter::visit_opr_expr(const repr::opr &op) const
+std::any interpreter::visit_opr_expr(const repr::opr* op) const
 {
     throw err(0, "Operator expressions don't have a `evaluate` support!");
 }
 
-std::any interpreter::visit_string_literal_expr(const repr::string_literal &literal) const
+std::any interpreter::visit_string_literal_expr(const repr::string_literal* literal) const
 {
-    auto value = literal.get_expr0();
+    auto value = literal->get_expr0();
     std::string result = value;
 
     // get rid of the quotation marks around the string when it was first created!
@@ -157,10 +166,10 @@ std::any interpreter::visit_string_literal_expr(const repr::string_literal &lite
     return result;
 }
 
-std::any interpreter::visit_unary_expr(const repr::unary &unary) const
+std::any interpreter::visit_unary_expr(const repr::unary* unary) const
 {
-    auto operand  = evaluate(unary.get_expr1());
-    const auto& oper8or = unary.get_expr0();
+    auto operand  = evaluate(&unary->get_expr1());
+    const auto& oper8or = unary->get_expr0();
 
     switch (oper8or.get_expr0().get_type()) {
         case scanner::token_type::MINUS:
@@ -175,60 +184,105 @@ std::any interpreter::visit_unary_expr(const repr::unary &unary) const
     }
 }
 
-std::any interpreter::visit_grouping_expr(const repr::grouping &group) const
+std::any interpreter::visit_grouping_expr(const repr::grouping* group) const
 {
-    return evaluate(group.get_expr0());
+    return evaluate(&group->get_expr0());
 }
 
-std::any interpreter::visit_variable_expr(const repr::variable &variable) const
+std::any interpreter::visit_variable_expr(const repr::variable* variable) const
 {
-    auto variable_name = variable.get_expr0().get_lexeme();
-    return environment.read(variable_name);
+    // evaluate the given variable
+    auto variable_name = variable->get_expr0().get_lexeme();
+    return current_environment->read(variable_name);
 }
 
-std::any interpreter::visit_print_statement(const stmt::print &st) const
+std::any interpreter::visit_print_statement(const stmt::print* st) const
 {
-    auto value = evaluate(st.get_expr0());
+    auto value = evaluate(&st->get_expr0());
 
-    std::cout << std::any_cast<double>(value) << '\n';
-
-    return 0;
-}
-
-std::any interpreter::visit_expression_statement(const stmt::expression &st) const
-{
-    evaluate(st.get_expr0());
-
-    return 0;
-}
-
-std::any interpreter::visit_variable_statement(const stmt::variable &variable) const
-{
-    std::any value = std::nullopt;
-    auto var_name = variable.get_expr0().get_lexeme();
-
-    if (variable.initialized()) value = evaluate(variable.get_expr1());
-
-    environment.write(var_name, value, glox::to_type(value));
-
-    return 0;
-}
-
-std::any interpreter::visit_assignment_expr(const repr::assignment &assignment) const
-{
-    auto var_name = assignment.get_expr0().get_lexeme();
-    std::any value = evaluate(assignment.get_expr1());
-
-    if (environment.exists(var_name))
+    if (glox::to_type(value) == value_type::STRING)
     {
-        environment.write(var_name, value, glox::to_type(value));
+        std::cout << std::any_cast<std::string>(value) << '\n';
     }
     else
     {
-        throw err(assignment.get_expr0().get_line(), "Tried to write to a variable that doesn't exist: " + var_name);
+        std::cout << std::any_cast<double>(value) << '\n';
+    }
+
+    return 0;
+}
+
+std::any interpreter::visit_expression_statement(const stmt::expression* st) const
+{
+    evaluate(&st->get_expr0());
+
+    return 0;
+}
+
+std::any interpreter::visit_variable_statement(const stmt::variable* variable) const
+{
+    std::any value = std::nullopt;
+    auto var_name = variable->get_expr0().get_lexeme();
+
+    if (variable->initialized()) value = evaluate(&variable->get_expr1());
+
+    current_environment->write(var_name, value, glox::to_type(value));
+
+    return 0;
+}
+
+std::any interpreter::visit_assignment_expr(const repr::assignment* assignment) const
+{
+    auto var_name = assignment->get_expr0().get_lexeme();
+    std::any value = evaluate(&assignment->get_expr1());
+
+    if (current_environment->exists(var_name))
+    {
+        current_environment->write(var_name, value, glox::to_type(value));
+    }
+    else
+    {
+        throw err(assignment->get_expr0().get_line(), "Tried to write to a variable that doesn't exist: " + var_name);
         return 1;
     }
 
     return 0;
+}
+
+std::any interpreter::visit_block_statement(const stmt::block* blk) const
+{
+    const auto& declarations = blk->get_expr0();
+
+    // create a new environment for the scope of the block statement:
+    // the parent is the current environment
+    auto new_environment = std::make_unique<stmt::environment>(current_environment);
+
+    // update the current environment to be the new env
+    current_environment = new_environment.get();
+
+    // pass the ownership of the environment to the interpreter class.
+    all_envs.push_back(std::move(new_environment));
+
+    for (const auto& declaration : declarations)
+    {
+        execute(declaration.get());
+    }
+
+    // kill the env of the block statement
+    stmt::environment* parent = all_envs.back()->parent();
+    current_environment = parent;
+
+    all_envs.pop_back();
+
+    return 0;
+}
+
+interpreter::interpreter()
+{
+    // create the global environment
+    all_envs.push_back(std::make_unique<stmt::environment>(nullptr));
+
+    // there is only 1 element in the all_envs list, and the last element will also be the first.
+    current_environment = all_envs.back().get();
 }
 }

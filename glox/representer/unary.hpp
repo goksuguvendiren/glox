@@ -32,7 +32,7 @@ namespace glox::repr
 
 		std::any accept(const visitor& visitor) const override
 		{
-			return visitor.visit_unary_expr(*this);
+			return visitor.visit_unary_expr(this);
 		}
 	};
 }

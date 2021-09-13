@@ -34,9 +34,9 @@ TEST_CASE("Can define and interpret a variable!")
     // should return zero
     REQUIRE_EQ(std::any_cast<int>(results[0]), 0);
 
-    REQUIRE_EQ(interpreter::environment.size(), 1);
-    REQUIRE_NOTHROW(interpreter::environment.read("a"));
-    auto value_any = interpreter::environment.read("a");
+    REQUIRE_EQ(interpreter::interpreter::get_current_environment()->size(), 1);
+    REQUIRE_NOTHROW(interpreter::interpreter::get_current_environment()->read("a"));
+    auto value_any = interpreter::interpreter::get_current_environment()->read("a");
     REQUIRE_NOTHROW(std::any_cast<double>(value_any));
 
     auto value = std::any_cast<double>(value_any);
@@ -57,9 +57,9 @@ TEST_CASE("Can define and interpret a variable!")
     REQUIRE_EQ(std::any_cast<int>(results[0]), 0);
     REQUIRE_EQ(std::any_cast<int>(results[1]), 0);
 
-    REQUIRE_EQ(interpreter::environment.size(), 1);
-    REQUIRE_NOTHROW(interpreter::environment.read("a"));
-    auto value_any = interpreter::environment.read("a");
+    REQUIRE_EQ(interpreter::interpreter::get_current_environment()->size(), 1);
+    REQUIRE_NOTHROW(interpreter::interpreter::get_current_environment()->read("a"));
+    auto value_any = interpreter::interpreter::get_current_environment()->read("a");
     REQUIRE_NOTHROW(std::any_cast<double>(value_any));
 
     auto value = std::any_cast<double>(value_any);
@@ -80,10 +80,10 @@ TEST_CASE("Can reassign a new value to an existing variable!")
     REQUIRE_EQ(std::any_cast<int>(results[0]), 0);
     REQUIRE_EQ(std::any_cast<int>(results[1]), 0);
 
-    REQUIRE_EQ(interpreter::environment.size(), 1);
+    REQUIRE_EQ(interpreter::interpreter::get_current_environment()->size(), 1);
 
-    REQUIRE_NOTHROW(interpreter::environment.read("a"));
-    auto value_any = interpreter::environment.read("a");
+    REQUIRE_NOTHROW(interpreter::interpreter::get_current_environment()->read("a"));
+    auto value_any = interpreter::interpreter::get_current_environment()->read("a");
     REQUIRE_NOTHROW(std::any_cast<double>(value_any));
 
     auto value = std::any_cast<double>(value_any);
@@ -97,5 +97,48 @@ TEST_CASE("Tries to assign to a variable that doesn't exist!")
 
     interpreter::interpreter interpreter;
     REQUIRE_THROWS_MESSAGE(interpreter.interpret(statements), "Tried to write to a variable that doesn't exist: b");
+}
+
+TEST_CASE("Testing the scope with multiple variables with the same name")
+{
+    auto contents = "var a = \"global a\";\n"
+                    "var b = \"global b\";\n"
+                    "var c = \"global c\";\n"
+                    "print a;\n"
+                    "print b;\n"
+                    "print c;";
+
+    auto statements = get_statements(contents);
+
+    interpreter::interpreter interpreter;
+    REQUIRE_NOTHROW(interpreter.interpret(statements));
+}
+
+TEST_CASE("Testing the scope with multiple variables with the same name")
+{
+    auto contents = "var a = \"global a\";\n"
+                    "var b = \"global b\";\n"
+                    "var c = \"global c\";\n"
+                    "{\n"
+                    "  var a = \"outer a\";\n"
+                    "  var b = \"outer b\";\n"
+                    "  {\n"
+                    "    var a = \"inner a\";\n"
+                    "    print a;\n"
+                    "    print b;\n"
+                    "    print c;\n"
+                    "  }\n"
+                    "  print a;\n"
+                    "  print b;\n"
+                    "  print c;\n"
+                    "}\n"
+                    "print a;\n"
+                    "print b;\n"
+                    "print c;";
+
+    auto statements = get_statements(contents);
+
+    interpreter::interpreter interpreter;
+    REQUIRE_NOTHROW(interpreter.interpret(statements));
 }
 }

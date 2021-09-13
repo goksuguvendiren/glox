@@ -24,6 +24,7 @@
 #include "statements/print.hpp"
 #include "statements/expression.hpp"
 #include "statements/variable.hpp"
+#include "statements/block.hpp"
 
 namespace glox::parser
 {
@@ -208,10 +209,29 @@ std::unique_ptr<glox::stmt::statement> parser::print_statement()
     return std::make_unique<stmt::print>(std::move(val));
 }
 
+std::unique_ptr<glox::stmt::statement> parser::block_statement()
+{
+    if (match(scanner::token_type::RIGHT_BRACE)) return nullptr;
+
+    std::vector<std::unique_ptr<glox::stmt::statement>> declarations;
+    while(!match(scanner::token_type::RIGHT_BRACE) && !finished())
+    {
+        auto val = declaration();
+        declarations.push_back(std::move(val));
+        // load all the declarations
+    }
+    if (previous().get_type() != scanner::token_type::RIGHT_BRACE) throw err(0, "Missing } for ending the block statement!");
+
+    return std::make_unique<stmt::block>(std::move(declarations));
+}
+
 std::unique_ptr<glox::stmt::statement> parser::statement()
 {
     if (match(scanner::token_type::PRINT))
         return print_statement();
+
+    if (match(scanner::token_type::LEFT_BRACE))
+        return block_statement();
 
     return expression_statement();
 }

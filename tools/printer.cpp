@@ -11,26 +11,28 @@
 #include "representer/string_literal.hpp"
 #include "representer/unary.hpp"
 #include "representer/grouping.hpp"
+#include "representer/variable.hpp"
 
 #include "statements/expression.hpp"
 #include "statements/print.hpp"
+#include "statements/variable.hpp"
 
 namespace glox::tools
 {
-std::any printer::visit_binary_expr(const repr::binary& binary) const
+std::any printer::visit_binary_expr(const repr::binary* binary) const
 {
-    const auto& oprtr = binary.get_expr1();
+    const auto& oprtr = binary->get_expr1();
     const auto& operator_token = oprtr.get_expr0();
 
     std::string result;
     result += "( ";
-    result += to_string(binary.get_expr1());
+    result += to_string(&binary->get_expr1());
     result += " ";
 
-    result += to_string(binary.get_expr0());
+    result += to_string(&binary->get_expr0());
     result += " ";
 
-    result += to_string(binary.get_expr2());
+    result += to_string(&binary->get_expr2());
     result += " ";
 
     result += ")";
@@ -38,65 +40,71 @@ std::any printer::visit_binary_expr(const repr::binary& binary) const
     return result;
 }
 
-std::any printer::visit_opr_expr(const repr::opr &op) const
+std::any printer::visit_opr_expr(const repr::opr* op) const
 {
-    return op.get_expr0().get_lexeme();
+    return op->get_expr0().get_lexeme();
 }
 
-std::any printer::visit_numeric_literal_expr(const repr::numeric_literal &op) const
+std::any printer::visit_numeric_literal_expr(const repr::numeric_literal* op) const
 {
-    return std::to_string(op.get_expr0());
+    return std::to_string(op->get_expr0());
 }
 
-std::any printer::visit_unary_expr(const repr::unary &op) const
+std::any printer::visit_unary_expr(const repr::unary* op) const
 {
-    const auto& token = op.get_expr0();
-    const auto& value = op.get_expr1();
+    const auto& token = op->get_expr0();
+    const auto& value = op->get_expr1();
 
     std::string result;
 
     result += "( ";
     result += token.get_expr0().get_lexeme();
     result += " ";
-    result += to_string(value);
+    result += to_string(&value);
     result += " )";
 
     return result;
 }
 
-std::any printer::visit_grouping_expr(const repr::grouping &op) const
+std::any printer::visit_grouping_expr(const repr::grouping* op) const
 {
-    return "( " + to_string(op.get_expr0()) + " )";
+    return std::string("( " + to_string(&op->get_expr0()) + " )");
 }
 
-std::any printer::visit_string_literal_expr(const repr::string_literal &op) const
+std::any printer::visit_string_literal_expr(const repr::string_literal* op) const
 {
-    return op.get_expr0();
+    return op->get_expr0();
 }
 
-std::any printer::visit_variable_expr(const repr::variable &op) const
+std::any printer::visit_variable_expr(const repr::variable* op) const
 {
-    assert(false);
-    return std::any();
+    return std::string(op->get_expr0().get_lexeme());
 }
 
-std::any printer::visit_print_statement(const stmt::print &st) const
+std::any printer::visit_print_statement(const stmt::print* st) const
 {
-    return "PRINT " +  to_string(st.get_expr0());
+    return std::string("PRINT " +  to_string(&st->get_expr0()));
 }
 
-std::any printer::visit_expression_statement(const stmt::expression &st) const
+std::any printer::visit_expression_statement(const stmt::expression* st) const
 {
-    return to_string(st.get_expr0());
+    return to_string(&st->get_expr0());
 }
 
-std::any glox::tools::printer::visit_variable_statement(const glox::stmt::variable &st) const
+std::any glox::tools::printer::visit_variable_statement(const glox::stmt::variable* st) const
 {
-    return std::any();
+    return std::string("var " + st->get_expr0().get_lexeme() + " = " + to_string(&st->get_expr1()));
 }
 
-std::any printer::visit_assignment_expr(const repr::assignment &op) const
+std::any printer::visit_assignment_expr(const repr::assignment* op) const
 {
+    std::cout << "visit_assignment_expr Not implemented!!\n";
+    return std::string("");
+}
+
+std::any printer::visit_block_statement(const stmt::block* st) const
+{
+    std::cout << "visit_block_statement Not implemented!!\n";
     assert(false);
     return std::any();
 }

@@ -26,9 +26,9 @@ public:
 private:
     std::unique_ptr<repr::expression> expr0;
 
-    std::any accept(const visitor& visitor) const
+    std::any accept(const stmt_visitor& visitor) const
     {
-        return visitor.visit_print_statement(*this);
+        return visitor.visit_print_statement(this);
     }
 };
 }

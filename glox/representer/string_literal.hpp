@@ -28,7 +28,7 @@ namespace glox::repr
 
 		std::any accept(const visitor& visitor) const
 		{
-			return visitor.visit_string_literal_expr(*this);
+			return visitor.visit_string_literal_expr(this);
 		}
 	};
 }

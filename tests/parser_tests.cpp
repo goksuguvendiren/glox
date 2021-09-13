@@ -121,32 +121,54 @@ TEST_CASE("Can reassign a new value to an existing variable!")
     auto assignment_expr = dynamic_cast<const repr::assignment*>(&(assignment_stmt->get_expr0()));
     REQUIRE_EQ(assignment_expr->get_expr0().get_lexeme(), "a");
     REQUIRE_EQ(assignment_expr->get_expr0().get_type(), scanner::token_type::IDENTIFIER);
-
-//    // the second statement is an expression statement, and the expression is a assignment expression
-//    auto assignment = dynamic_cast<stmt::expression*>(statements[1].get());
-//    REQUIRE_EQ(var_statement->get_expr0().get_lexeme(), "a");
 }
 
-TEST_CASE("Can define a variable without initializing it!")
+TEST_CASE("Can define an empty scope!")
 {
-    auto contents = "var a = b = c = 3;";
-//    auto tokens = get_tokens(contents);
+    auto contents = "{}";
+    auto tokens = get_tokens(contents);
 
-//    parser::parser parser(tokens);
-//    auto statements = parser.parse();
-//
-//    // should have exactdly 1 statement
-//    REQUIRE_EQ(statements.size(), 2);
-//
-//    auto var_statement = dynamic_cast<stmt::variable*>(statements[0].get());
-//    REQUIRE_EQ(var_statement->get_expr0().get_lexeme(), "a");
-//
-//    REQUIRE(var_statement[0].initialized());
-//
-//    // returns an expression
-//    auto print_statement = dynamic_cast<stmt::print*>(statements[1].get());
-//
-//    // can cast the value to a numeric literal
-//    REQUIRE_NOTHROW(const auto& a = dynamic_cast<const repr::variable&>(print_statement->get_expr0()));
+    parser::parser parser(tokens);
+
+    REQUIRE_NOTHROW(parser.parse());
 }
+
+TEST_CASE("Can define an empty scope!")
+{
+    auto contents = "{ var a = 3; }";
+    auto tokens = get_tokens(contents);
+
+    parser::parser parser(tokens);
+
+    REQUIRE_NOTHROW(parser.parse());
+}
+
+TEST_CASE("Testing the scope with multiple variables with the same name")
+{
+    auto contents = "var a = \"global a\";\n"
+                    "var b = \"global b\";\n"
+                    "var c = \"global c\";\n"
+                    "{\n"
+                    "  var a = \"outer a\";\n"
+                    "  var b = \"outer b\";\n"
+                    "  {\n"
+                    "    var a = \"inner a\";\n"
+                    "    print a;\n"
+                    "    print b;\n"
+                    "    print c;\n"
+                    "  }\n"
+                    "  print a;\n"
+                    "  print b;\n"
+                    "  print c;\n"
+                    "}\n"
+                    "print a;\n"
+                    "print b;\n"
+                    "print c;";
+
+    auto tokens = get_tokens(contents);
+
+    parser::parser parser(tokens);
+    REQUIRE_NOTHROW(parser.parse());
+}
+
 }

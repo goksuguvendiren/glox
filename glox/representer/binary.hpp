@@ -36,7 +36,7 @@ namespace glox::repr
 
 		std::any accept(const visitor& visitor) const
 		{
-			return visitor.visit_binary_expr(*this);
+			return visitor.visit_binary_expr(this);
 		}
 	};
 }

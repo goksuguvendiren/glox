@@ -28,7 +28,7 @@ private:
 
     std::any accept(const visitor& visitor) const
     {
-        return visitor.visit_numeric_literal_expr(*this);
+        return visitor.visit_numeric_literal_expr(this);
     }
 };
 inline bool operator==(const numeric_literal& lhs, const numeric_literal& rhs) { return lhs.get_expr0() == rhs.get_expr0(); }

@@ -35,9 +35,9 @@ class variable : public stmt::statement
 
 		bool initd = false;
 
-		std::any accept(const visitor& visitor) const
+		std::any accept(const stmt_visitor& visitor) const
 		{
-			return visitor.visit_variable_statement(*this);
+			return visitor.visit_variable_statement(this);
 		}
 	};
 }
